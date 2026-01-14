@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>응급처치 히어로: 뱀에 물렸을 때</title>
+    <style>
+        body { font-family: 'Nanum Gothic', sans-serif; text-align: center; background-color: #e8f5e9; padding: 20px; }
+        #game-container { background: white; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(46, 125, 50, 0.2); border: 3px solid #a5d6a7; }
+        h1 { color: #2e7d32; margin-bottom: 10px; }
+        .status-box { font-size: 1.1rem; margin: 20px 0; padding: 20px; background-color: #f1f8e9; border: 2px dashed #81c784; border-radius: 15px; min-height: 80px; line-height: 1.6; }
+        .btn-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { padding: 15px; font-size: 0.95rem; cursor: pointer; border: none; border-radius: 12px; background-color: #4caf50; color: white; transition: 0.2s; font-weight: bold; word-break: keep-all; }
+        button:hover { background-color: #2e7d32; transform: translateY(-2px); }
+        #message { margin-top: 20px; font-weight: bold; height: 30px; }
+        .success { color: #1b5e20; }
+        .error { color: #c62828; animation: shake 0.3s; }
+        #restart-btn { display: none; background-color: #ff9800; margin-top: 20px; width: 100%; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 100% { transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h1>🐍 응급처치 히어로</h1>
+    <p>숲길을 걷다 친구가 뱀에 물렸어요!<br>독이 퍼지지 않게 올바른 순서로 도와주세요.</p>
+    
+    <div class="status-box" id="step-display">
+        게임을 시작하려면 아래 버튼 중<br><b>가장 먼저 할 일</b>을 골라주세요!
+    </div>
+
+    <div class="btn-container" id="button-grid"></div>
+
+    <div id="message"></div>
+    <button id="restart-btn" onclick="startGame()">다시 공부하기</button>
+</div>
+
+<script>
+    const snakeSteps = [
+        { id: 1, text: "1. 안전한 곳으로 옮기고 119 신고", comment: "뱀이 다시 나타날 수 있으니 안전한 곳으로 피하고 신고해요." },
+        { id: 2, text: "2. 앉거나 눕혀서 움직이지 않게 하기", comment: "많이 움직이면 혈액순환이 빨라져 독이 더 빨리 퍼져요!" },
+        { id: 3, text: "3. 장신구(반지, 시계) 미리 빼주기", comment: "상처가 부어오르면 나중에 빼기 힘들고 피가 안 통할 수 있어요." },
+        { id: 4, text: "4. 물린 곳을 심장보다 낮게 두기", comment: "독이 심장 쪽으로 빨리 올라가지 못하게 낮게 유지해요." },
+        { id: 5, text: "5. 깨끗한 물로 상처 씻어주기", comment: "독과 이물질을 씻어내고, 뱀의 모양을 기억해 병원으로 가요." }
+    ];
+
+    let currentStep = 0;
+
+    function startGame() {
+        currentStep = 0;
+        document.getElementById('step-display').innerHTML = "게임을 시작하려면 아래 버튼 중<br><b>가장 먼저 할 일</b>을 골라주세요!";
+        document.getElementById('message').innerHTML = "";
+        document.getElementById('restart-btn').style.display = "none";
+        renderButtons();
+    }
+
+    function renderButtons() {
+        const grid = document.getElementById('button-grid');
+        grid.innerHTML = "";
+        const shuffled = [...snakeSteps].sort(() => Math.random() - 0.5);
+        
+        shuffled.forEach(step => {
+            const btn = document.createElement('button');
+            btn.innerText = step.text;
+            btn.onclick = () => checkAnswer(step.id);
+            grid.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedId) {
+        const messageEl = document.getElementById('message');
+        const displayEl = document.getElementById('step-display');
+
+        if (selectedId === snakeSteps[currentStep].id) {
+            displayEl.innerHTML = `✅ <b>참 잘했어요!</b> <br>${snakeSteps[currentStep].text}<br><small style='color:#1b5e20'>${snakeSteps[currentStep].comment}</small>`;
+            messageEl.innerHTML = `<span class="success">정확한 판단이에요! 다음은요?</span>`;
+            currentStep++;
+
+            if (currentStep === snakeSteps.length) {
+                displayEl.innerHTML = "🎊 <b>최고의 안전 히어로!</b> 🎊<br>덕분에 친구가 무사히 병원에 갈 수 있게 되었어요!";
+                messageEl.innerHTML = "";
+                document.getElementById('button-grid').innerHTML = "";
+                document.getElementById('restart-btn').style.display = "block";
+            }
+        } else {
+            messageEl.innerHTML = `<span class="error">앗! 이 행동은 독을 더 빨리 퍼지게 할 수도 있어요.</span>`;
+        }
+    }
+
+    startGame();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>CPR 히어로 게임</title>
+    <style>
+        body { font-family: 'Nanum Gothic', sans-serif; text-align: center; background-color: #f0f8ff; padding: 20px; }
+        #game-container { background: white; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        h1 { color: #e74c3c; }
+        .step-box { font-size: 1.2rem; margin-bottom: 20px; padding: 15px; border: 2px dashed #ddd; border-radius: 10px; min-height: 50px; }
+        .btn-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        button { padding: 15px; font-size: 1rem; cursor: pointer; border: none; border-radius: 10px; background-color: #3498db; color: white; transition: 0.3s; }
+        button:hover { background-color: #2980b9; transform: scale(1.05); }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        #message { margin-top: 20px; font-weight: bold; font-size: 1.1rem; }
+        .success { color: #27ae60; }
+        .error { color: #e74c3c; }
+        #restart-btn { display: none; background-color: #2ecc71; margin-top: 20px; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h1>🚨 CPR 히어로 🚨</h1>
+    <p>쓰러진 사람을 발견했어요! 올바른 순서를 골라주세요.</p>
+    
+    <div class="step-box" id="step-display">
+        게임을 시작하려면 아래 버튼 중 <br>첫 번째 할 일을 고르세요!
+    </div>
+
+    <div class="btn-container" id="button-grid">
+        </div>
+
+    <div id="message"></div>
+    <button id="restart-btn" onclick="startGame()">처음부터 다시 하기</button>
+</div>
+
+<script>
+    // CPR 순서 데이터
+    const cprSteps = [
+        { id: 1, text: "1. 어깨를 두드리며 반응 확인하기", comment: "먼저 사람이 의식이 있는지 확인해야 해요!" },
+        { id: 2, text: "2. 주변 사람에게 119 신고 부탁하기", comment: "콕 집어서(예: 파란 티셔츠 입은 분!) 신고를 부탁하세요." },
+        { id: 3, text: "3. 가슴 압박 30회 실시하기", comment: "깍지 낀 손으로 가슴 중앙을 강하고 빠르게 눌러요." },
+        { id: 4, text: "4. 인공호흡 2회 실시하기", comment: "코를 막고 입을 맞추어 숨을 불어넣어요." },
+        { id: 5, text: "5. 119 올 때까지 반복하기", comment: "구조대원이 올 때까지 멈추지 않는 것이 중요해요!" }
+    ];
+
+    let currentStep = 0;
+
+    function startGame() {
+        currentStep = 0;
+        document.getElementById('step-display').innerHTML = "게임을 시작하려면 아래 버튼 중 <br>첫 번째 할 일을 고르세요!";
+        document.getElementById('message').innerHTML = "";
+        document.getElementById('restart-btn').style.display = "none";
+        renderButtons();
+    }
+
+    function renderButtons() {
+        const grid = document.getElementById('button-grid');
+        grid.innerHTML = "";
+        
+        // 버튼을 무작위 순서로 섞기
+        const shuffled = [...cprSteps].sort(() => Math.random() - 0.5);
+        
+        shuffled.forEach(step => {
+            const btn = document.createElement('button');
+            btn.innerText = step.text;
+            btn.onclick = () => checkAnswer(step.id);
+            grid.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedId) {
+        const messageEl = document.getElementById('message');
+        const displayEl = document.getElementById('step-display');
+
+        if (selectedId === cprSteps[currentStep].id) {
+            // 정답일 때
+            displayEl.innerHTML = `✅ <b>현재 단계:</b> <br>${cprSteps[currentStep].text}`;
+            messageEl.innerHTML = `<span class="success">참 잘했어요! ${cprSteps[currentStep].comment}</span>`;
+            currentStep++;
+
+            if (currentStep === cprSteps.length) {
+                messageEl.innerHTML = "<h2 class='success'>🎊 축하합니다! 당신은 생명을 살리는 히어로예요! 🎊</h2>";
+                document.getElementById('button-grid').innerHTML = "";
+                document.getElementById('restart-btn').style.display = "block";
+            }
+        } else {
+            // 틀렸을 때
+            messageEl.innerHTML = `<span class="error">앗! 순서가 틀렸어요. 다시 한번 생각해보세요!</span>`;
+        }
+    }
+
+    // 초기 실행
+    startGame();
+</script>
+
+</body>
+</html>

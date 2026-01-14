@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>응급처치 히어로: 뇌전증 편</title>
+    <style>
+        body { font-family: 'Nanum Gothic', sans-serif; text-align: center; background-color: #f3e5f5; padding: 20px; }
+        #game-container { background: white; max-width: 600px; margin: 0 auto; padding: 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(156, 39, 176, 0.2); border: 3px solid #e1bee7; }
+        h1 { color: #8e24aa; margin-bottom: 10px; }
+        .status-box { font-size: 1.1rem; margin: 20px 0; padding: 20px; background-color: #faf5ff; border: 2px dashed #ce93d8; border-radius: 15px; min-height: 80px; line-height: 1.6; }
+        .btn-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        button { padding: 15px; font-size: 0.95rem; cursor: pointer; border: none; border-radius: 12px; background-color: #ab47bc; color: white; transition: 0.2s; font-weight: bold; word-break: keep-all; }
+        button:hover { background-color: #8e24aa; transform: translateY(-2px); }
+        #message { margin-top: 20px; font-weight: bold; height: 30px; }
+        .success { color: #2e7d32; }
+        .error { color: #c62828; animation: shake 0.3s; }
+        #restart-btn { display: none; background-color: #00bcd4; margin-top: 20px; width: 100%; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 100% { transform: translateX(0); } }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h1>🧠 응급처치 히어로</h1>
+    <p>친구가 갑자기 쓰러져 몸을 떨고 있어요!<br>당황하지 말고 순서대로 도와주세요.</p>
+    
+    <div class="status-box" id="step-display">
+        게임을 시작하려면 아래 버튼 중<br><b>가장 먼저 할 일</b>을 골라주세요!
+    </div>
+
+    <div class="btn-container" id="button-grid"></div>
+
+    <div id="message"></div>
+    <button id="restart-btn" onclick="startGame()">다시 배우기</button>
+</div>
+
+<script>
+    const seizureSteps = [
+        { id: 1, text: "1. 주변의 위험한 물건 치우기", comment: "부딪혀서 다칠 수 있는 책상이나 의자를 멀리 치워주세요." },
+        { id: 2, text: "2. 머리 아래에 부드러운 것 받치기", comment: "수건이나 옷을 접어서 머리 아래에 두어 머리를 보호해요." },
+        { id: 3, text: "3. 안경을 벗기고 단추 풀러주기", comment: "숨쉬기 편하게 옷의 단추를 풀고 안경을 벗겨주세요." },
+        { id: 4, text: "4. 몸을 옆으로 살짝 돌려주기", comment: "침이나 이물질이 기도를 막지 않게 고개를 옆으로 돌려줘요(회복자세)." },
+        { id: 5, text: "5. 끝날 때까지 옆에서 지켜보기", comment: "경련 시간을 확인하며 끝날 때까지 안심시켜 주세요." }
+    ];
+
+    let currentStep = 0;
+
+    function startGame() {
+        currentStep = 0;
+        document.getElementById('step-display').innerHTML = "게임을 시작하려면 아래 버튼 중<br><b>가장 먼저 할 일</b>을 골라주세요!";
+        document.getElementById('message').innerHTML = "";
+        document.getElementById('restart-btn').style.display = "none";
+        renderButtons();
+    }
+
+    function renderButtons() {
+        const grid = document.getElementById('button-grid');
+        grid.innerHTML = "";
+        const shuffled = [...seizureSteps].sort(() => Math.random() - 0.5);
+        
+        shuffled.forEach(step => {
+            const btn = document.createElement('button');
+            btn.innerText = step.text;
+            btn.onclick = () => checkAnswer(step.id);
+            grid.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(selectedId) {
+        const messageEl = document.getElementById('message');
+        const displayEl = document.getElementById('step-display');
+
+        if (selectedId === seizureSteps[currentStep].id) {
+            displayEl.innerHTML = `✅ <b>정답이에요!</b> <br>${seizureSteps[currentStep].text}<br><small style='color:#6a1b9a'>${seizureSteps[currentStep].comment}</small>`;
+            messageEl.innerHTML = `<span class="success">침착하게 잘하고 있어요!</span>`;
+            currentStep++;
+
+            if (currentStep === seizureSteps.length) {
+                displayEl.innerHTML = "🎊 <b>마음이 따뜻한 히어로!</b> 🎊<br>뇌전증 친구를 안전하게 보호해주었군요!";
+                messageEl.innerHTML = "";
+                document.getElementById('button-grid').innerHTML = "";
+                document.getElementById('restart-btn').style.display = "block";
+            }
+        } else {
+            messageEl.innerHTML = `<span class="error">앗! 이 행동은 나중에 하거나 위험할 수 있어요.</span>`;
+        }
+    }
+
+    startGame();
+</script>
+
+</body>
+</html>
